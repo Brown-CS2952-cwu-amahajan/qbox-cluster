@@ -1,2 +1,4 @@
 .terraform/*
 values.tfvars
+.vscode
+.terraform
