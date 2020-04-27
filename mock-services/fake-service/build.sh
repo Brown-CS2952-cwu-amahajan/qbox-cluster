@@ -1,2 +1,2 @@
-sudo docker build . -t gordonwu/fake-service
-sudo docker push gordonwu/fake-service
+sudo docker build . -t cs2952fspring2020amahajcwu/fake-service
+sudo docker push cs2952fspring2020amahajcwu/fake-service

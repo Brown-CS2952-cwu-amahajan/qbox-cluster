@@ -6,21 +6,22 @@ import shutil
 import stat
 
 class TerraformTemplate:
-    def __init__(self, services):
+    def __init__(self, tfvars, services):
+        self.tfvars = tfvars
         string = ""
         for i, s in enumerate(services):
             if i != 0:
                 string += " && "
             string += f"kubectl create configmap {s}-configmap --from-file {s}/config.yaml"
-
-        self.template = \
-f"""service_account_key_path = "/Users/gordonwu/Downloads/ordinal-motif-270122-b60019637135.json"
-password = "TqzreFzPqXWKdDWQVfsj6Uv3ZX"
+        f = open(tfvars, "r")
+        v_str = f.read()
+        self.template = v_str + f"""
 bookinfo_apps_path = "test.yaml"
 add_configmap = "{string}"
 """
-    def get_file(self):
-        return self.template
+        f.close()
+    def write2file(self, f):
+        f.write(self.template)
 
 class DeploymentTemplate:
     def __init__(self, name, bad, middle):
@@ -54,8 +55,8 @@ class DeploymentTemplate:
                             "containers": [
                                 {
                                     "name": name,
-                                    "image": "docker.io/gordonwu/fake-service:latest" if not bad \
-                                        else "docker.io/gordonwu/fake-service-bad:latest",
+                                    "image": "docker.io/cs2952fspring2020amahajcwu/fake-service:latest" if not bad \
+                                        else "docker.io/cs2952fspring2020amahajcwu/fake-service-bad:latest",
                                     "imagePullPolicy": "Always",
                                     "ports": [
                                         {
@@ -72,7 +73,7 @@ class DeploymentTemplate:
             self.template["spec"]["template"]["spec"]["containers"].append(
                 {
                     "name": "qbox",
-                    "image": "docker.io/gordonwu/qbox:latest",
+                    "image": "docker.io/cs2952fspring2020amahajcwu/qbox:latest",
                     "imagePullPolicy": "Always",
                     "ports": [
                         {
@@ -278,9 +279,9 @@ kubectl delete -f test.yaml
         return self.run_template
 
 
-def config_generator(file, dir = '.'):
+def config_generator(file, tfvars, dir='.'):
     if os.path.isdir(os.path.join(dir, "test")):
-        print("here")
+        # print("here")
         shutil.rmtree(os.path.join(dir, "test"))
     # os.mkdir(os.path.join(dir, "test"))
     shutil.copytree(os.path.join(dir, "lib"), os.path.join(dir, "test"))
@@ -329,9 +330,10 @@ def config_generator(file, dir = '.'):
     os.chmod(os.path.join(dir, "test", "stop.sh"), st.st_mode | stat.S_IEXEC)
 
     f = open(os.path.join(dir, "test", "values.tfvars"), "w")
-    t = TerraformTemplate(services)
-    f.write(t.get_file())
+    t = TerraformTemplate(tfvars, services)
+    t.write2file(f)
     f.close()
 
+
 if __name__ == "__main__":
-    config_generator(sys.argv[1])
+    config_generator(sys.argv[1], sys.argv[2])
