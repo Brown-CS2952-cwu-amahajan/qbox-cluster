@@ -2,3 +2,4 @@
 values.tfvars
 .vscode
 .terraform
+test

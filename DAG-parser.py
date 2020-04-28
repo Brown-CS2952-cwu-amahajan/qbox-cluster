@@ -12,11 +12,11 @@ class TerraformTemplate:
         for i, s in enumerate(services):
             if i != 0:
                 string += " && "
-            string += f"kubectl create configmap {s}-configmap --from-file {s}/config.yaml"
+            string += f"kubectl create configmap {s}-configmap --from-file test/{s}/config.yaml"
         f = open(tfvars, "r")
         v_str = f.read()
         self.template = v_str + f"""
-bookinfo_apps_path = "test.yaml"
+bookinfo_apps_path = "test/test.yaml"
 add_configmap = "{string}"
 """
         f.close()
@@ -283,8 +283,8 @@ def config_generator(file, tfvars, dir='.'):
     if os.path.isdir(os.path.join(dir, "test")):
         # print("here")
         shutil.rmtree(os.path.join(dir, "test"))
-    # os.mkdir(os.path.join(dir, "test"))
-    shutil.copytree(os.path.join(dir, "lib"), os.path.join(dir, "test"))
+    os.mkdir(os.path.join(dir, "test"))
+    # shutil.copytree(os.path.join(dir, "lib"), os.path.join(dir, "test"))
 
     f = open(file, "r")
     obj = json.load(f)
