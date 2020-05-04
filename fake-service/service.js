@@ -67,7 +67,7 @@ dispatcher.onGet(/^\/delete\/[0-9]*/, function(req, res) {
 
     log_message({"id": id, "process": process.env.NAME, "action": "Received delete request"})
     delete_id(id)
-    log_message({"id": id, "process": process.env.NAME, "action": "Completed add request"})
+    log_message({"id": id, "process": process.env.NAME, "action": "Completed delete request"})
 
     res.writeHead(200, {'Content-type': 'application/json'})
     res.end(JSON.stringify(local_log))
@@ -132,8 +132,8 @@ dispatcher.onGet(/^\/saga-delete\/[0-9]*/, function(req, res) {
         log_message({"id": id, "process": process.env.NAME, "action": "Issued saga-delete request to all children"})
         if (result.statusCode != 200) { 
             log_message({"id": id, "process": process.env.NAME, "action": "Received failure from saga on saga-delete"})
-            delete_id(id) 
-            log_message({"id": id, "process": process.env.NAME, "action": "Deleted saga-delete value locally"})
+            add_id(id) 
+            log_message({"id": id, "process": process.env.NAME, "action": "Restored saga-delete value locally"})
         }
         res.writeHead(result.statusCode, { 'Content-type': 'application/json' })
         res.end(JSON.stringify(local_log))
